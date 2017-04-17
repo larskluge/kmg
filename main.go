@@ -35,18 +35,23 @@ func main() {
 	defer ui.Close()
 
 	table := ui.NewTable()
-	table.Rows = [][]string{headerRow}
 	table.FgColor = ui.ColorWhite
 	table.BgColor = ui.ColorDefault
 	table.TextAlign = ui.AlignRight
 
-	ui.Handle("/timer/1s", func(e ui.Event) {
+	draw := func() {
 		table.Rows = Rows(client)
 		table.FgColors = []ui.Attribute{}
 		table.BgColors = []ui.Attribute{}
 		table.Analysis()
 		table.SetSize()
 		ui.Render(table)
+	}
+
+	draw()
+
+	ui.Handle("/timer/1s", func(e ui.Event) {
+		draw()
 	})
 
 	ui.Handle("/sys/kbd/q", func(ui.Event) {
