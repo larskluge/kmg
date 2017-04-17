@@ -14,7 +14,7 @@ import (
 
 var (
 	brokersFlag = flag.String("kafka-brokers", "kafka:9092", "Kafka Brokers, separate multiple with ','")
-	headerRow   = []string{"Topic", "Partitions", "Total Offset", "Growth"}
+	headerRow   = []string{"Topic", "Partitions", "Estimated Messages", "Total Offset", "Growth"}
 	offsets     = map[string][5]int64{}
 )
 
@@ -80,14 +80,19 @@ func Rows(client sarama.Client) [][]string {
 
 		row = append(row, strconv.Itoa(len(partitions)))
 
-		var offset int64 = 0
+		var offset, count int64 = 0, 0
 		for _, partition := range partitions {
 			offsetNewest, err := client.GetOffset(topic, partition, sarama.OffsetNewest)
 			check(err)
 
+			offsetOldest, err := client.GetOffset(topic, partition, sarama.OffsetOldest)
+			check(err)
+
 			offset += offsetNewest
+			count += offsetNewest - offsetOldest
 		}
 
+		row = append(row, fmt.Sprintf("%18s", humanize.Comma(count)))
 		row = append(row, fmt.Sprintf("%18s", humanize.Comma(offset)))
 
 		// msg/s calculation
