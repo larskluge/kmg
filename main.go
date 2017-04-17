@@ -42,6 +42,8 @@ func main() {
 
 	ui.Handle("/timer/1s", func(e ui.Event) {
 		table.Rows = Rows(client)
+		table.FgColors = []ui.Attribute{}
+		table.BgColors = []ui.Attribute{}
 		table.Analysis()
 		table.SetSize()
 		ui.Render(table)
