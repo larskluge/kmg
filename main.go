@@ -15,6 +15,8 @@ import (
 var (
 	brokersFlag = flag.String("kafka-brokers", "kafka:9092", "Kafka Brokers, separate multiple with ','")
 	headerRow   = []string{"Topic", "Partitions", "Estimated Messages", "Total Offset", "Growth"}
+	sepRow      = []string{"─", "─", "─", "─", "─"}
+	headers     = [][]string{headerRow, sepRow}
 	offsets     = map[string][5]int64{}
 )
 
@@ -35,6 +37,8 @@ func main() {
 	defer ui.Close()
 
 	table := ui.NewTable()
+	table.Border = false
+	table.Separator = false
 	table.FgColor = ui.ColorWhite
 	table.BgColor = ui.ColorDefault
 	table.TextAlign = ui.AlignRight
@@ -67,7 +71,7 @@ func (a ByTopicName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByTopicName) Less(i, j int) bool { return a[i][0] < a[j][0] }
 
 func Rows(client sarama.Client) [][]string {
-	rows := [][]string{headerRow}
+	rows := [][]string{}
 
 	topics, err := client.Topics()
 	check(err)
@@ -111,7 +115,8 @@ func Rows(client sarama.Client) [][]string {
 		rows = append(rows, row)
 	}
 	sort.Sort(ByTopicName(rows))
-	return rows
+
+	return append(headers, rows...)
 }
 
 func check(err error) {
