@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	brokersFlag = flag.String("kafka-brokers", "kafka:9092", "Kafka Brokers, separate multiple with ','")
+	brokersFlag = flag.String("kafka-brokers", "127.0.0.1:9092,kafka:9092", "Kafka Brokers, separate multiple with ','")
 	headerRow   = []string{"Topic", "Partitions", "Estimated Messages", "Total Offset", "Growth"}
 	sepRow      = []string{"─", "─", "─", "─", "─"}
 	headers     = [][]string{headerRow, sepRow}
